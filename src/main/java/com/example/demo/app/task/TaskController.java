@@ -1,5 +1,6 @@
 package com.example.demo.app.task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,14 +43,16 @@ public class TaskController {
     @GetMapping
     public String task(TaskForm taskForm, Model model) {
 
-    	//新規登録か更新かを判断する仕掛け
+      // 新規登録か更新かを判断するために必要
+      taskForm.setNewTask(true);
 
-        //Taskのリストを取得する
+      //Taskのリストを取得する
+      List<Task> list = taskService.findAll();
 
-        model.addAttribute("list", "");
-        model.addAttribute("title", "タスク一覧");
+      model.addAttribute("list", list);
+      model.addAttribute("title", "タスク一覧");
 
-        return "task/index";
+      return "task/index";
     }
 
     /**
