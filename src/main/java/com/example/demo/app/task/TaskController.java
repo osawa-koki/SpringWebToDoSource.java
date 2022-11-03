@@ -63,28 +63,30 @@ public class TaskController {
    * @return
    */
   @PostMapping("/insert")
-  public String insert(
-    @Valid @ModelAttribute TaskForm taskForm,
-      BindingResult result,
-      Model model) {
+  public String insert(@Valid @ModelAttribute TaskForm taskForm, BindingResult result, Model model) {
 
-      if (!result.hasErrors()) {
-        //削除してください
-        Task task = null;
+//    // 詰めかえ
+//    Task task = new Task();
+//    task.setUserId(1);
+//    task.setTypeId(taskForm.getTypeId());
+//    task.setTitle(taskForm.getTitle());
+//    task.setDetail(taskForm.getDetail());
+//    task.setDeadline(taskForm.getDeadline());
 
-        //TaskFormのデータをTaskに格納
+    Task task = makeTask(taskForm, 0);
 
-        //一件挿入後リダイレクト
-
-          return "";
-      } else {
-          taskForm.setNewTask(true);
-          model.addAttribute("taskForm", taskForm);
-          List<Task> list = taskService.findAll();
-          model.addAttribute("list", list);
-          model.addAttribute("title", "タスク一覧（バリデーション）");
-          return "task/index";
-      }
+    if (result.hasErrors()) {
+      taskForm.setNewTask(true);
+      model.addAttribute("taskForm", taskForm);
+      List<Task> list = taskService.findAll();
+      model.addAttribute("list", list);
+      model.addAttribute("title", "タスク一覧（バリデーション）");
+      return "task/index";
+    } else {
+      // 挿入処理
+      taskService.insert(task);
+      return "redirect:/task";
+    }
   }
 
   /**
