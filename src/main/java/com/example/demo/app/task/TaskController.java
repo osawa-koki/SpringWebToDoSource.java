@@ -96,25 +96,28 @@ public class TaskController {
    * @param model
    * @return
    */
+  // パスパラメタは「@PathVariable」で取得可能
   @GetMapping("/{id}")
-  public String showUpdate(
-    TaskForm taskForm,
-      @PathVariable int id,
-      Model model) {
+  public String showUpdate(TaskForm taskForm, @PathVariable int id, Model model) {
 
     //Taskを取得(Optionalでラップ)
+    Optional<Task> taskOpt = taskService.getTask(id);
 
-      //TaskFormへの詰め直し
+    //TaskFormへの詰め直し
+    Optional<TaskForm> taskFormOpt = taskOpt.map(t -> makeTaskForm(t));
 
-      //TaskFormがnullでなければ中身を取り出し
+    //TaskFormがnullでなければ中身を取り出し
+    if (taskFormOpt.isPresent()) {
+      taskForm = taskFormOpt.get();
+    }
 
-      model.addAttribute("taskForm", "");
-      List<Task> list = taskService.findAll();
-      model.addAttribute("list", list);
-      model.addAttribute("taskId", id);
-      model.addAttribute("title", "更新用フォーム");
+    model.addAttribute("taskForm", taskForm);
+    List<Task> list = taskService.findAll();
+    model.addAttribute("list", list);
+    model.addAttribute("taskId", id);
+    model.addAttribute("title", "更新用フォーム");
 
-      return "task/index";
+    return "task/index";
   }
 
   /**
@@ -126,24 +129,22 @@ public class TaskController {
    * @return
    */
   @PostMapping("/update")
-  public String update(
-    @Valid @ModelAttribute TaskForm taskForm,
-    BindingResult result,
-    @RequestParam("taskId") int taskId,
-    Model model,
-    RedirectAttributes redirectAttributes) {
+  public String update(@Valid @ModelAttribute TaskForm taskForm, BindingResult result, @RequestParam("taskId") int taskId, Model model, RedirectAttributes redirectAttributes) {
 
-      if (!result.hasErrors()) {
-        //TaskFormのデータをTaskに格納
+    Task task = makeTask(taskForm, taskId);
 
-        //更新処理、フラッシュスコープの使用、リダイレクト（個々の編集ページ）
+    if (result.hasErrors()) {
+      model.addAttribute("taskForm", taskForm);
+      model.addAttribute("title", "タスク一覧");
+      return "task/index";
+    } else {
+      //TaskFormのデータをTaskに格納
+      taskService.update(task);
 
-          return "" ;
-      } else {
-          model.addAttribute("taskForm", taskForm);
-          model.addAttribute("title", "タスク一覧");
-          return "task/index";
-      }
+      //更新処理、フラッシュスコープの使用、リダイレクト（個々の編集ページ）
+      redirectAttributes.addFlashAttribute("complete", "updated");
+      return "redirect:/task/" + taskId;
+    }
   }
 
   /**
@@ -153,13 +154,11 @@ public class TaskController {
    * @return
    */
   @PostMapping("/delete")
-  public String delete(
-    @RequestParam("taskId") int id,
-    Model model) {
+  public String delete(@RequestParam("taskId") int id, Model model) {
 
     //タスクを一件削除しリダイレクト
-
-      return "";
+    taskService.deleteById(id);
+    return "redirect:/task";
   }
 
   /**
