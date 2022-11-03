@@ -1,12 +1,16 @@
 package com.example.demo.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.example.demo.dao.TaskDao;
 import com.example.demo.entity.Task;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 // スタブクラスを使うため
 @ExtendWith(MockitoExtension.class)
@@ -27,7 +32,9 @@ class TaskServiceImplUnitTest {
   @Mock
   private TaskDao dao;
 
-  @InjectMocks // テスト対象クラス　モックを探す newする
+  // テスト対象クラス
+  // モックを探すためのスタブをnewする
+  @InjectMocks
   private TaskServiceImpl taskServiceImpl;
 
   @Test // テストケース
@@ -48,11 +55,12 @@ class TaskServiceImplUnitTest {
     verify(dao, times(1)).findAll();
 
     // 戻り値の検査(expected, actual)
-    Assertions.assertEquals(0, actualList.size());
+    assertEquals(0, actualList.size());
 
   }
 
-  @Test // テストケース
+  // テストケース
+  @Test
   @DisplayName("テーブルTaskの全件取得で2件の場合のテスト")
       // テスト名
   void testFindAllReturnList() {
@@ -74,7 +82,7 @@ class TaskServiceImplUnitTest {
     verify(dao, times(1)).findAll();
 
     // 戻り値の検査(expected, actual)
-    Assertions.assertEquals(2, actualList.size());
+    assertEquals(2, actualList.size());
 
   }
 
@@ -84,9 +92,14 @@ class TaskServiceImplUnitTest {
   void testGetTaskThrowException() {
 
     // モッククラスのI/Oをセット
+    when(dao.findById(0)).thenThrow(new EmptyResultDataAccessException(1));
 
     //タスクが取得できないとTaskNotFoundExceptionが発生することを検査
-
+    try {
+      Optional<Task> task0 = taskServiceImpl.getTask(0);
+    } catch (TaskNotFoundException e) {
+      assertEquals(e.getMessage(), "cannot find a task specified.");
+    }
   }
 
   @Test // テストケース
@@ -95,14 +108,20 @@ class TaskServiceImplUnitTest {
   void testGetTaskReturnOne() {
 
     //Taskをデフォルト値でインスタンス化
+    Task task = new Task();
+    Optional<Task> taskOpt = Optional.ofNullable(task);
 
     // モッククラスのI/Oをセット
+    when(dao.findById(1)).thenReturn(taskOpt);
 
     // サービスを実行
+    Optional<Task> taskActual = taskServiceImpl.getTask(1);
 
     // モックの指定メソッドの実行回数を検査
+    verify(dao, times(1)).findById(1);
 
     //Taskが存在していることを確認
+    assertTrue(taskActual.isPresent());
 
   }
 
@@ -112,8 +131,14 @@ class TaskServiceImplUnitTest {
   void throwNotFoundException() {
 
     // モッククラスのI/Oをセット
+    when(dao.deleteById(99)).thenReturn(0);
 
     //削除対象が存在しない場合、例外が発生することを検査
+    try {
+      taskServiceImpl.deleteById(99);
+    } catch (TaskNotFoundException e) {
+      assertEquals(e.getMessage(), "cannot find a task to delete.");
+    }
 
   }
 }
