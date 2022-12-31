@@ -12,6 +12,19 @@ docker run -p 80:80 -it --rm --name my-java-spring-todo java-spring-todo
 docker build -t java-spring-todo . && docker run -p 80:80 -it --rm --name my-java-spring-todo java-spring-todo
 ```
 
+## デプロイ設定(Render.com)
+
+| キー | バリュー |
+| ---- | ---- |
+| Name | java-spring-todo |
+| Region | Oregon(US West) |
+| Branch | main |
+| Root Directory |  |
+| Environment | Docker |
+| Dockerfile Path | ./Dockerfile |
+| Docker Build Context Directory |  |
+| Docker Command |  |
+
 ### Optional
 
 null許容型的な、、、  
