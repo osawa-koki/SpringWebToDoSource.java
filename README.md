@@ -2,7 +2,15 @@
 
 Springフレームワーク(Java)でtodoアプリを作る学習用プロジェクト。  
 
-## 自分用メモ
+## 実行方法
+
+```shell
+docker build -t java-spring-todo .
+docker run -p 80:80 -it --rm --name my-java-spring-todo java-spring-todo
+
+# 一行で書くなら
+docker build -t java-spring-todo . && docker run -p 80:80 -it --rm --name my-java-spring-todo java-spring-todo
+```
 
 ### Optional
 
