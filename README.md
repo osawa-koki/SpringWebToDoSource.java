@@ -2,6 +2,8 @@
 
 Springフレームワーク(Java)でtodoアプリを作る学習用プロジェクト。  
 
+![成果物](./.development/fruits/todo.gif)  
+
 ## 実行方法
 
 ```shell
