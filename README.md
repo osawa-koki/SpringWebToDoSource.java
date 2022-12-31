@@ -6,7 +6,7 @@ Springフレームワーク(Java)でtodoアプリを作る学習用プロジェ�
 
 ## 実行方法
 
-普通にEclipseやIntelliJ IDEAで実行すればOK  
+普通にEclipseやIntelliJ IDEAで実行すればOK!  
 <http://localhost:80>へアクセス。  
 
 Dockerで実行するなら以下の通り。  
