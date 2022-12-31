@@ -1,5 +1,5 @@
-FROM openjdk:17
-RUN microdnf install findutils
+FROM openjdk:11
+EXPOSE 80
 COPY . /work
 WORKDIR /work
 RUN chmod +x ./gradlew
